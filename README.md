@@ -15,7 +15,9 @@
 
     $ git clone
 
-### and run as root:
+### and run as a user with enough capabilities:
+
+    $ ./rottapaci.py -p '/var/www/first_site /var/www/second_site ...'
 
 ## What's up, doc?
 

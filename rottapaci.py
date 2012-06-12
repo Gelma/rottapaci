@@ -1,7 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Rottapaci watches your PHP site as a Rottweiler.
-   See the README.md for details.
+"""
+rottapaci.py watches your PHP site as a Rottweiler.
+
+Usage: rottapaci.py [OPTIONS]
+OPTIONS are:
+    -h, --help    print help
+    -p, --path   specify one or more paths to monitor (separeted by space)
+
+    Example: rottapaci.py -p '/var/www/first_site /var/www/secondo_site'
+
+------
 
    Copyright 2010-2012 - Andrea Gelmini (andrea.gelmini@gelma.net)
 
@@ -19,21 +28,71 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>."""
 
 # FIX:
+#     read file configuration
+#     check python version
 #     check for inotify enabled
 #     check for inotify resources
+#     intercept signals like 15
 
-import pyinotify, sys
+import atexit, getopt, multiprocessing, os, sys
 
-if __name__ == "__main__":
+try:
+    import pyinotify # https://github.com/seb-m/pyinotify
+except:
+    sys.exit("Error: I need PyInotify package - https://github.com/seb-m/pyinotify/wiki\n       Debian/Ubuntu: apt-get install python-pyinotify\n       Else: sudo easy_install pyinotify")
+
+def killall_threads():
+	"I kill every multiprocessing thread"
+
+	for id in multiprocessing.active_children():
+         id.terminate()
+
+class EventHandler(pyinotify.ProcessEvent):
+    "My subclass to manage events"
+
+    def process_IN_CLOSE_WRITE(self, event):
+        print "Close write:", event.pathname
+
+    def process_IN_MOVED_TO(self, event):
+        print "Close write:", event.pathname
+
+def start_watching(paths):
+    "Start watching the paths specified in list PATHS"
+
+    if not len(paths): sys.exit("Error: no path to monitor")
+
     wm = pyinotify.WatchManager()
-    notifier = pyinotify.Notifier(wm)
-    events_to_monitor=pyinotify.IN_CREATE|pyinotify.IN_MODIFY|pyinotify.IN_CLOSE_WRITE
-    path_to_monitor=['/tmp/test1','/tmp/test2']
+    handler = EventHandler()
+    notifier = pyinotify.Notifier(wm, handler)
+    mask = pyinotify.IN_CLOSE_WRITE|pyinotify.IN_MOVED_TO # IN_CLOSE_WRITE implies IN_CREATE and IN_MODIFY
+
+    for path in paths: # we need just dirs
+        if not os.path.isdir(path):
+            sys.exit("Error: %s is not a directory" % path)
 
     try:
-        wm.add_watch(path_to_monitor, events_to_monitor, quiet=False, rec=True, auto_add=True)
+        wm.add_watch(paths, mask, quiet=False, rec=True, auto_add=True)
     except pyinotify.WatchManagerError, err:
         print err, err.wmd
-        sys.exit()
+        sys.exit(1)
 
     notifier.loop()
+
+if __name__ == "__main__":
+
+    paths = [] # we use this to collect paths to monitor
+    try: # parsing command line arguments
+        opts, args = getopt.getopt(sys.argv[1:], "hp:", ["help", "path"])
+    except getopt.GetoptError, err:
+        print str(err) # will print something like "option -a not recognized"
+        sys.exit(__doc__)
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            sys.exit(__doc__)
+        elif opt in ("-p", "--path"):
+            paths = [dir for dir in arg.split()]
+
+    atexit.register(killall_threads)
+    p = multiprocessing.Process(target=start_watching, args=(paths,))
+    p.start()
+    p.join()
