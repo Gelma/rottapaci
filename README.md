@@ -1,8 +1,7 @@
 # Rottapaci
 
 * License          : GPL3
-* Project URL      : [http://github.com/](http://github.com/)
-* Project Wiki     : [http://github.com/](http://github.com/)
+* Project URL      : [https://github.com/Gelma/rottapache](https://github.com/Gelma/rottapache)
 
 ## Dependencies
 

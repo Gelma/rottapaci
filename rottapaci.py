@@ -5,12 +5,13 @@ rottapaci.py watches your PHP site as a Rottweiler.
 
 Usage: rottapaci.py [OPTIONS]
 OPTIONS are:
-    -h, --help    print help
-    -p, --path   specify one or more paths to monitor (separeted by space)
+   -h, --help    print help
+   -p, --path   specify one or more paths to monitor (separeted by space)
 
-    Example: rottapaci.py -p '/var/www/first_site /var/www/secondo_site'
+   Example: rottapaci.py -p '/var/www/first_site /var/www/secondo_site'
 
-    ------
+   URL: https://github.com/Gelma/rottapache
+   ------
 
    Copyright 2010-2012 - Andrea Gelmini (andrea.gelmini@gelma.net)
 
