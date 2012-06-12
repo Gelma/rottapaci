@@ -1,14 +1,15 @@
 # Rottapaci
 
+* Project URL      : https://github.com/Gelma/rottapaci
 * License          : GPL3
-* Project URL      : [https://github.com/Gelma/rottapache](https://github.com/Gelma/rottapache)
+* Author           : Andrea Gelmini (andrea.gelmini@gelma.net)
 
 ## Dependencies
 
 * Linux kernel with Inotify enabled
 * Python ≥ 2.6
-* [https://github.com/ahupp/python-magic](python-magic)
-* [https://github.com/seb-m/pyinotify/wiki](python-pynotify)
+* [python-magic](https://github.com/ahupp/python-magic)
+* [python-pynotify](https://github.com/seb-m/pyinotify/wiki)
 
 ## Install
 
