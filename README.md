@@ -24,4 +24,5 @@ It keep an eye on what happens in the Apache DocumentRoot of your site.
 If some new file appears, it:
 * checks white list filename (for files to ignore by name)
 * checks file type (via file utility)
+* checks if is a good known file
 * if there something like a C file, it shouts via mail, chat, web
