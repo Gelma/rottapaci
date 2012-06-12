@@ -5,7 +5,7 @@ rottapaci.py watches your PHP site as a Rottweiler.
 
 Usage: rottapaci.py [OPTIONS]
 OPTIONS are:
-   -h, --help    print help
+   -h, --help   print help
    -p, --path   specify one or more paths to monitor (separeted by space)
 
    Example: rottapaci.py -p '/var/www/first_site /var/www/secondo_site'
@@ -13,7 +13,7 @@ OPTIONS are:
    URL: https://github.com/Gelma/rottapache
    ------
 
-   Copyright 2010-2012 - Andrea Gelmini (andrea.gelmini@gelma.net)
+   Copyright 2012 - Andrea Gelmini (andrea.gelmini@gelma.net)
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,8 +35,11 @@ OPTIONS are:
 #     check for inotify enabled
 #     check for inotify resources
 #     intercept signals like 15
+#     log to syslog
+#     send analysis to other machine
 
 import atexit, getopt, multiprocessing, os, sys
+import csi
 
 try:
     import pyinotify # https://github.com/seb-m/pyinotify
@@ -52,11 +55,14 @@ def killall_threads():
 class EventHandler(pyinotify.ProcessEvent):
     "My subclass to manage events"
 
+    def start_check(self, filename):
+	multiprocessing.Process(target=csi.EventAnalysis, args=(filename,)).start()
+
     def process_IN_CLOSE_WRITE(self, event):
-        print "Close write:", event.pathname
+	self.start_check(event.pathname)
 
     def process_IN_MOVED_TO(self, event):
-        print "Moved to:", event.pathname
+	self.start_check(event.pathname)
 
 def start_watching(paths):
     "Start watching the paths specified in list PATHS"
