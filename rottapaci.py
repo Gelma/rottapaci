@@ -10,7 +10,7 @@ OPTIONS are:
 
     Example: rottapaci.py -p '/var/www/first_site /var/www/secondo_site'
 
-------
+    ------
 
    Copyright 2010-2012 - Andrea Gelmini (andrea.gelmini@gelma.net)
 
@@ -25,7 +25,8 @@ OPTIONS are:
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>."""
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 # FIX:
 #     read file configuration
@@ -45,7 +46,7 @@ def killall_threads():
 	"I kill every multiprocessing thread"
 
 	for id in multiprocessing.active_children():
-         id.terminate()
+	    id.terminate()
 
 class EventHandler(pyinotify.ProcessEvent):
     "My subclass to manage events"
@@ -54,7 +55,7 @@ class EventHandler(pyinotify.ProcessEvent):
         print "Close write:", event.pathname
 
     def process_IN_MOVED_TO(self, event):
-        print "Close write:", event.pathname
+        print "Moved to:", event.pathname
 
 def start_watching(paths):
     "Start watching the paths specified in list PATHS"
@@ -66,9 +67,11 @@ def start_watching(paths):
     notifier = pyinotify.Notifier(wm, handler)
     mask = pyinotify.IN_CLOSE_WRITE|pyinotify.IN_MOVED_TO # IN_CLOSE_WRITE implies IN_CREATE and IN_MODIFY
 
-    for path in paths: # we need just dirs
+    for path in paths: # just dirs
         if not os.path.isdir(path):
             sys.exit("Error: %s is not a directory" % path)
+
+    paths = [os.path.abspath(dir) for dir in arg.split()]
 
     try:
         wm.add_watch(paths, mask, quiet=False, rec=True, auto_add=True)
@@ -90,7 +93,7 @@ if __name__ == "__main__":
         if opt in ("-h", "--help"):
             sys.exit(__doc__)
         elif opt in ("-p", "--path"):
-            paths = [dir for dir in arg.split()]
+            paths = [os.path.abspath(dir) for dir in arg.strip().split()]
 
     atexit.register(killall_threads)
     p = multiprocessing.Process(target=start_watching, args=(paths,))
