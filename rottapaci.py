@@ -41,8 +41,6 @@ OPTIONS are:
 import atexit, ConfigParser, getopt, multiprocessing, os, sys
 import logit, csi
 
-lock_logit = multiprocessing.Lock()
-
 try:
     import pyinotify # https://github.com/seb-m/pyinotify
 except:
