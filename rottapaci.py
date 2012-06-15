@@ -38,7 +38,7 @@ OPTIONS are:
 #     log to syslog
 #     send analysis to other machine
 
-import atexit, ConfigParser, getopt, multiprocessing, os, sys
+import atexit, ConfigParser, datetime, getopt, inspect, multiprocessing, os, sys
 import csi
 
 try:
@@ -46,11 +46,40 @@ try:
 except:
     sys.exit("Error: I need PyInotify package - https://github.com/seb-m/pyinotify/wiki\n       Debian/Ubuntu: apt-get install python-pyinotify\n       Else: sudo easy_install pyinotify")
 
-def killall_threads():
-	"I kill every multiprocessing thread"
+lock_logit = multiprocessing.Lock()
 
-	for id in multiprocessing.active_children():
-	    id.terminate()
+def killall_threads():
+    "I kill every multiprocessing thread"
+
+    for id in multiprocessing.active_children():
+        id.terminate()
+
+def logit(*args):
+    """I receive strings/iterable objects, convert them to text and put somewhere."""
+
+    output_to = "stdout" # ('file','term','syslog')
+
+    try:
+        caller = inspect.stack()[1][3]
+    except:
+        caller = ''
+
+    log_line = datetime.datetime.now().strftime('%H:%M:%S') + ' (' + caller + '):'
+
+    try:
+        log_line += ' '.join(args)
+    except: # so, something isn't txt
+        for item in args:
+            log_line += ' %s' % item
+
+    with lock_logit:
+	if output_to == "stdout":
+	    print log_line
+	    return
+
+	if output_to == "file":
+	    log_file.write(linea_log + '\n')
+	    log_file.flush()
 
 class EventHandler(pyinotify.ProcessEvent):
     "My subclass to manage events"
@@ -108,7 +137,7 @@ if __name__ == "__main__":
             paths = [os.path.abspath(dir) for dir in arg.strip().split()]
 
     # add path from config file
-    
+
     atexit.register(killall_threads)
     p = multiprocessing.Process(target=start_watching, args=(paths,))
     p.start()
