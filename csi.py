@@ -8,6 +8,7 @@ I receive a file, and analyze it
 """
 
 import sys
+import logit
 
 try:
     import magic # FIX: add check to be sure about which magic package is loaded
@@ -26,6 +27,4 @@ def EventAnalysis(filename):
     # whitelist/blacklist by type
     # whitelist/blacklist by hash
 
-    import time
-    print "ora dormo"
-    time.sleep(60)
+    logit.log("Start check",filename)
