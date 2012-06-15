@@ -73,25 +73,25 @@ def logit(*args):
             log_line += ' %s' % item
 
     with lock_logit:
-	if output_to == "stdout":
-	    print log_line
-	    return
+        if output_to == "stdout":
+            print log_line
+            return
 
-	if output_to == "file":
-	    log_file.write(linea_log + '\n')
-	    log_file.flush()
+        if output_to == "file":
+            log_file.write(linea_log + '\n')
+            log_file.flush()
 
 class EventHandler(pyinotify.ProcessEvent):
     "My subclass to manage events"
 
     def start_check(self, filename):
-	multiprocessing.Process(target=csi.EventAnalysis, args=(filename,)).start()
+        multiprocessing.Process(target=csi.EventAnalysis, args=(filename,)).start()
 
     def process_IN_CLOSE_WRITE(self, event):
-	self.start_check(event.pathname)
+        self.start_check(event.pathname)
 
     def process_IN_MOVED_TO(self, event):
-	self.start_check(event.pathname)
+        self.start_check(event.pathname)
 
 def start_watching(paths):
     "Start watching the paths specified in list PATHS"
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     configuration = ConfigParser.ConfigParser()
     config = configuration.read(['/etc/rottapaci.conf', os.path.join(os.environ["HOME"], '.rottapaci.conf'), 'rottapaci.conf'])
     if not config:
-	sys.exit("Error: problems with configuration file")
+        sys.exit("Error: problems with configuration file")
 
     paths = []
     try: # parsing command line arguments
