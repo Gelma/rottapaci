@@ -38,7 +38,7 @@ OPTIONS are:
 #     log to syslog
 #     send analysis to other machine
 
-import atexit, getopt, multiprocessing, os, sys
+import atexit, ConfigParser, getopt, multiprocessing, os, sys
 import csi
 
 try:
@@ -90,7 +90,12 @@ def start_watching(paths):
 
 if __name__ == "__main__":
 
-    paths = [] # we use this to collect paths to monitor
+    configuration = ConfigParser.ConfigParser()
+    config = configuration.read(['/etc/rottapaci.conf', os.path.join(os.environ["HOME"], '.rottapaci.conf'), 'rottapaci.conf'])
+    if not config:
+	sys.exit("Error: problems with configuration file")
+
+    paths = []
     try: # parsing command line arguments
         opts, args = getopt.getopt(sys.argv[1:], "hp:", ["help", "path"])
     except getopt.GetoptError, err:
@@ -102,6 +107,8 @@ if __name__ == "__main__":
         elif opt in ("-p", "--path"):
             paths = [os.path.abspath(dir) for dir in arg.strip().split()]
 
+    # add path from config file
+    
     atexit.register(killall_threads)
     p = multiprocessing.Process(target=start_watching, args=(paths,))
     p.start()
