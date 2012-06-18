@@ -8,7 +8,7 @@ OPTIONS are:
    -h, --help   print help
    -p, --path   specify one or more paths to monitor (separeted by space)
 
-   Example: rottapaci.py -p '/var/www/first_site /var/www/secondo_site'
+   Example: rottapaci.py -p '/var/www/first_site /var/www/second_site'
 
    URL: https://github.com/Gelma/rottapache
    ------
@@ -56,7 +56,8 @@ class EventHandler(pyinotify.ProcessEvent):
     "My subclass to manage events"
 
     def start_check(self, filename):
-        multiprocessing.Process(target=csi.EventAnalysis, args=(filename,)).start()
+        check = csi.EventAnalysis(filename)
+        multiprocessing.Process(target=check.run()).start()
 
     def process_IN_CLOSE_WRITE(self, event):
         self.start_check(event.pathname)

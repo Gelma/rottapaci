@@ -15,16 +15,25 @@ try:
 except:
     sys.exit("Error: I need python-magic package - https://github.com/ahupp/python-magic\n       sudo easy_install python-magic")
 
-def EventAnalysis(filename):
+class EventAnalysis():
     "I receive a filename and check it"
+
+    filename = None
+
+    def __init__(self, filename):
+        self.filename = filename
+
+    def run(self):
+        logit.log("Start check",self.filename)
+        
 
     # A file can be:
     #   white: I know it's good, I stop check
     #   black: I know it's dangerous, I alert
     #   neutral: I dunno, keep goin', give a warning
+    #   with an int: a niceness value
     # check if file still exists
     # whitelist/blacklist by regexp
     # whitelist/blacklist by type
     # whitelist/blacklist by hash
 
-    logit.log("Start check",filename)
